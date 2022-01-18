@@ -1,0 +1,943 @@
+{
+  "luis_schema_version": "7.0.0",
+  "intents": [
+    {
+      "name": "AskForBuyRecommendation",
+      "features": [
+        {
+          "modelName": "asset_type",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "name": "AskForSellRecommendation",
+      "features": [
+        {
+          "modelName": "asset_type",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "name": "BuyAssets",
+      "features": [
+        {
+          "modelName": "purchase_details",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "name": "None",
+      "features": []
+    },
+    {
+      "name": "SellAssets",
+      "features": [
+        {
+          "modelName": "purchase_details",
+          "isRequired": false
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "name": "purchase_details",
+      "children": [
+        {
+          "name": "number_of stocks",
+          "children": [],
+          "features": []
+        },
+        {
+          "name": "asset",
+          "children": [
+            {
+              "name": "asset name",
+              "children": [],
+              "features": []
+            }
+          ],
+          "features": []
+        },
+        {
+          "name": "price",
+          "children": [],
+          "features": []
+        }
+      ],
+      "roles": [],
+      "features": []
+    }
+  ],
+  "hierarchicals": [],
+  "composites": [],
+  "closedLists": [
+    {
+      "name": "asset_type",
+      "subLists": [
+        {
+          "canonicalForm": "stock",
+          "list": [
+            "share",
+            "equity",
+            "stocks",
+            "shares"
+          ]
+        },
+        {
+          "canonicalForm": "bond",
+          "list": [
+            "annuinity",
+            "bonds"
+          ]
+        },
+        {
+          "canonicalForm": "option",
+          "list": [
+            "put option",
+            "call option"
+          ]
+        },
+        {
+          "canonicalForm": "cryptocurrency",
+          "list": [
+            "crypto",
+            "token"
+          ]
+        }
+      ],
+      "roles": []
+    }
+  ],
+  "prebuiltEntities": [],
+  "utterances": [
+    {
+      "text": "buy 3 amzn at market price",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 4,
+          "endPos": 25,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 14,
+              "endPos": 25,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 6,
+              "endPos": 9,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 6,
+                  "endPos": 9,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 4,
+              "endPos": 4,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "buy 40 shares of alibaba at $140",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 4,
+          "endPos": 31,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 28,
+              "endPos": 31,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 17,
+              "endPos": 23,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 17,
+                  "endPos": 23,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "asset",
+              "startPos": 7,
+              "endPos": 12,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 4,
+              "endPos": 5,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "buy four stocks of facebook at market price",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 4,
+          "endPos": 42,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 31,
+              "endPos": 42,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 19,
+              "endPos": 26,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 19,
+                  "endPos": 26,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "asset",
+              "startPos": 9,
+              "endPos": 14,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 4,
+              "endPos": 7,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "buy one msft limit 310 usd",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 4,
+          "endPos": 25,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 19,
+              "endPos": 25,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 8,
+              "endPos": 11,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 8,
+                  "endPos": 11,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 4,
+              "endPos": 6,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "could you recommend me stocks to buy?",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "could you recommend me stocks to sell?",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "give me stocks to buy",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "help me by reccommending what shares to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "i do not want to buy stocks",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i do not want to trade",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i do not wish to buy stocks",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i don't want to buy anything",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i want to buy 3 bonds on whatever price",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 14,
+          "endPos": 38,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 25,
+              "endPos": 38,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 14,
+              "endPos": 14,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 16,
+              "endPos": 20,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "i want to buy 5 shares of tsla at 1050",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 14,
+          "endPos": 37,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 34,
+              "endPos": 37,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 26,
+              "endPos": 29,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 26,
+                  "endPos": 29,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "asset",
+              "startPos": 16,
+              "endPos": 21,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 14,
+              "endPos": 14,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "i would like to purchase options for walt disney",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 25,
+          "endPos": 47,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 37,
+              "endPos": 47,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 37,
+                  "endPos": 47,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "asset",
+              "startPos": 25,
+              "endPos": 31,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 25,
+                  "endPos": 31,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "i would like to sell amazon",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 21,
+          "endPos": 26,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 21,
+              "endPos": 26,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 21,
+                  "endPos": 26,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "purchase 100 stocks of facebook on market price",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 9,
+          "endPos": 46,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 35,
+              "endPos": 46,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 23,
+              "endPos": 30,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 23,
+                  "endPos": 30,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 9,
+              "endPos": 11,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 13,
+              "endPos": 18,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "purchase 12 nvidia at 215 dollars",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 9,
+          "endPos": 32,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 22,
+              "endPos": 32,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 9,
+              "endPos": 10,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 12,
+              "endPos": 17,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 12,
+                  "endPos": 17,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "recommend bonds to purchase",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "recommend me crypto to buy",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "recommend me crypto to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "recommend shares",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "recommend stocks to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "recommended stocks to buy",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "sell 101 tesla at $1050",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 5,
+          "endPos": 22,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 9,
+              "endPos": 13,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 9,
+                  "endPos": 13,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "price",
+              "startPos": 18,
+              "endPos": 22,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 5,
+              "endPos": 7,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "sell all my bonds",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 5,
+          "endPos": 16,
+          "children": [
+            {
+              "entity": "number_of stocks",
+              "startPos": 5,
+              "endPos": 7,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 12,
+              "endPos": 16,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "sell all my visa shares",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 5,
+          "endPos": 22,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 17,
+              "endPos": 22,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 12,
+              "endPos": 15,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 12,
+                  "endPos": 15,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 5,
+              "endPos": 7,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "sell my aapl shares at market price",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 8,
+          "endPos": 34,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 23,
+              "endPos": 34,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 13,
+              "endPos": 18,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 8,
+              "endPos": 11,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 8,
+                  "endPos": 11,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "sell my jnj call options at $55",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 8,
+          "endPos": 30,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 28,
+              "endPos": 30,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 12,
+              "endPos": 23,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 8,
+              "endPos": 10,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 8,
+                  "endPos": 10,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "suggest some shares",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "suggest stocks to buy",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "suggest stocks to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "suggest what shares to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "tell me what stocks to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "want to buy stocks",
+      "intent": "BuyAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 12,
+          "endPos": 17,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 12,
+              "endPos": 17,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "want to sell 4 shares of walmart at 145.4",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 13,
+          "endPos": 40,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 36,
+              "endPos": 40,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 25,
+              "endPos": 31,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 25,
+                  "endPos": 31,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "asset",
+              "startPos": 15,
+              "endPos": 20,
+              "children": []
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 13,
+              "endPos": 13,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "want to sell google at 3234.1 dollars",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 13,
+          "endPos": 36,
+          "children": [
+            {
+              "entity": "price",
+              "startPos": 23,
+              "endPos": 36,
+              "children": []
+            },
+            {
+              "entity": "asset",
+              "startPos": 13,
+              "endPos": 18,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 13,
+                  "endPos": 18,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "want to sell stocks",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 13,
+          "endPos": 18,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 13,
+              "endPos": 18,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "what are the best stocks to buy?",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "what stocks should i sell?",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "wish to sell half of my pfe",
+      "intent": "SellAssets",
+      "entities": [
+        {
+          "entity": "purchase_details",
+          "startPos": 13,
+          "endPos": 26,
+          "children": [
+            {
+              "entity": "asset",
+              "startPos": 24,
+              "endPos": 26,
+              "children": [
+                {
+                  "entity": "asset name",
+                  "startPos": 24,
+                  "endPos": 26,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "entity": "number_of stocks",
+              "startPos": 13,
+              "endPos": 16,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "versionId": "0.1",
+  "name": "Stock market top movers",
+  "desc": "First test of conversational bot",
+  "culture": "en-us",
+  "tokenizerVersion": "1.0.0",
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "phraselists": [],
+  "regex_features": [],
+  "patterns": [],
+  "settings": []
+}
