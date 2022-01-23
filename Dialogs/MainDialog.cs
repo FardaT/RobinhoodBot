@@ -45,6 +45,9 @@ namespace RobinhoodBot.Dialogs
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
         }
+
+
+
         // Figure out the user's intent and run the appropriate dialog to act on it
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -57,9 +60,7 @@ namespace RobinhoodBot.Dialogs
             }
 
             // Use the text provided in FinalStepAsync or the default if it is the first time.
-            var messageText = stepContext.Options?.ToString() ?? "Welcome to Robinhood trading platform! How can we help you?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+            return await stepContext.NextAsync(null, cancellationToken);
         }
 
 
@@ -84,7 +85,7 @@ namespace RobinhoodBot.Dialogs
                 case StockMarketTopMovers.Intent.SellAssets:
                     var tradeDetails = new TradeDetails()
                     {
-                        AssetName = luisResult.Entities?.purchase_details?.FirstOrDefault().asset[1].asset_name?.FirstOrDefault(),
+                        AssetName = luisResult.Entities?.purchase_details?.FirstOrDefault().asset.FirstOrDefault()?.asset_name?.FirstOrDefault(),
                         NumberOfAssets = luisResult.Entities?.purchase_details?.FirstOrDefault().number_of_stocks?.FirstOrDefault(),
                         Price = luisResult.Entities?.purchase_details?.FirstOrDefault().price?.FirstOrDefault(),
                         AssetType = luisResult?.Entities?.asset_type?.FirstOrDefault()?.FirstOrDefault(),

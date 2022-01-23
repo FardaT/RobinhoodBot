@@ -56,6 +56,8 @@ namespace RobinhoodBot
             // Create the bot as a transient. for both QnA & LUIS
             services.AddTransient<IBot, DialogBot<MainDialog>>();
 
+            
+
 
 
 

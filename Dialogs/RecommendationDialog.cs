@@ -5,12 +5,15 @@ using RobinhoodBot.Model;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Globalization;
 
 namespace RobinhoodBot.Dialogs
 {
     public class RecommendationDialog : CancelAndHelpDialog
     {
-        private const string recommendationIntent = "sell";
+
+
+        private const string recommendationIntent = "buy";
         public RecommendationDialog()
         : base(nameof(RecommendationDialog))
         {
@@ -55,7 +58,11 @@ namespace RobinhoodBot.Dialogs
             }
             else
             {
-                var promptMessage = MessageFactory.Text($"fasz", InputHints.ExpectingInput);
+
+                var RecommendationObject = new StockDataRequest();
+                var recommendation = await RecommendationObject.GetBuyStockRecommendationAsync();
+
+                var promptMessage = MessageFactory.Text(@$"Our top pick for you is {recommendation.Company} - ({recommendation.Ticker}) at the market price of {recommendation.ClosingPrice.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))})", InputHints.ExpectingInput);
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
             }
         }
