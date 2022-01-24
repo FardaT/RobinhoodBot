@@ -29,7 +29,7 @@ namespace RobinhoodBot.Dialogs
             }));
 
             // The initial child Dialog to run.
-            InitialDialogId = nameof(WaterfallDialog);
+            InitialDialogId = nameof(TradeDialog);
         }
 
         //Ask for Asset type if missing

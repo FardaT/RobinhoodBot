@@ -8,9 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using RobinhoodBot.Model;
-using Azure.AI.Language.QuestionAnswering;
-using System;
-using Azure;
+using Microsoft.Bot.Builder.Dialogs.Choices;
+using System.Collections.Generic;
 
 namespace RobinhoodBot.Dialogs
 {
@@ -18,16 +17,13 @@ namespace RobinhoodBot.Dialogs
     {
         private readonly StockTradingRecognizer _luisRecognizer;
         protected readonly ILogger Logger;
-        public QuestionAnsweringClient client { get; private set; }
+
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(StockTradingRecognizer luisRecognizer, ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
-            //Disrorderly management of QA 
-            Uri endpoint = new Uri("https://westeurope.api.cognitive.microsoft.com/");
-            AzureKeyCredential credential = new AzureKeyCredential("720d4f403e61473fa3b40e39538b9b6a");
-            client = new QuestionAnsweringClient(endpoint, credential);
+
             Logger = logger;
             _luisRecognizer = luisRecognizer;
 
@@ -35,17 +31,19 @@ namespace RobinhoodBot.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new RecommendationDialog());
             AddDialog(new TradeDialog());
+            //AddDialog(new QuestionAnsweringDialog());
+            AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
                 ActStepAsync,
                 FinalStepAsync,
+                EndingStepAsync,
             }));
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
         }
-
 
 
         // Figure out the user's intent and run the appropriate dialog to act on it
@@ -94,17 +92,33 @@ namespace RobinhoodBot.Dialogs
                     return await stepContext.BeginDialogAsync(nameof(TradeDialog), tradeDetails, cancellationToken);
 
                 default:
-                    //Call QuestionAnswering to see if it catches the question
-                    string projectName = "InvestmentQnA";
-                    string deploymentName = "production";
-                    QuestionAnsweringProject project = new QuestionAnsweringProject(projectName, deploymentName);
-                    Response<AnswersResult> response = await client.GetAnswersAsync(stepContext.Context.Activity.Text , project);
-                    // Catch all for unhandled intents
+                    // call QA if no match for LUIS
+                    var questionAnswering = new QuestionAnswering();
+                    var response = await questionAnswering.QuestionAnswerAsync(stepContext.Context.Activity.Text);
 
+                    // QA answers if possible and prompts for another question
                     if (response.Value?.Answers?.Count > 0)
                     {
                         var answer = response.Value?.Answers.FirstOrDefault().Answer;
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(answer), cancellationToken);
+                        break;
+                        //return await stepContext.NextAsync(null, cancellationToken);
+                        //return await stepContext.PromptAsync(nameof(ChoicePrompt),
+                        //new PromptOptions
+                        //{
+                        //    Prompt = MessageFactory.Text("Would you like to know anything else?"),
+                        //    Choices = ChoiceFactory.ToChoices(new List<string> { "Yes", "No"}),
+                        //}, cancellationToken);
+
+                        //public static async Task<DialogTurnResult> RestartStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+                        //{
+
+                        //}
+
+
+
+
+
                     }
                     else
                     // If no match for either QA or LUIS
@@ -114,7 +128,7 @@ namespace RobinhoodBot.Dialogs
                         await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
                         break;
                     }
-                    break;
+
             }
 
             return await stepContext.NextAsync(null, cancellationToken);
@@ -137,8 +151,29 @@ namespace RobinhoodBot.Dialogs
             }
 
             // Restart the main dialog with a different message the second time around
-            var promptMessage = "What else can We do for you?";
-            return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+            //var promptMessage = "What else can We do for you?";
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt),
+            new PromptOptions
+            {
+                Prompt = MessageFactory.Text("Would you like to know anything else?"),
+                Choices = ChoiceFactory.ToChoices(new List<string> { "Yes", "No" }),
+            }, cancellationToken);
+            //return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+        }
+        private async Task<DialogTurnResult> EndingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            if (stepContext.Context.Activity.Text == "No")
+            {
+                var messageText = "Thank you for choosing our service";
+                var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = message }, cancellationToken);
+
+            }
+            else
+            {
+                return await stepContext.ReplaceDialogAsync(InitialDialogId, cancellationToken);
+            }
         }
     }
 }

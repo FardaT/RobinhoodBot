@@ -53,6 +53,7 @@ namespace RobinhoodBot
                 throw new HttpRequestException("Something went wrong while fulfilling request. Please try again later or use our other services.");
         }
 
+        //Method to match Ticker symbol with Company Name
         private static string CompanyNameFinder(string ticker)
         {
             var dict_ticker_company_name = new Dictionary<string, string>();
@@ -67,6 +68,7 @@ namespace RobinhoodBot
                 return dict_ticker_company_name[ticker];
             return "";
         }
+        //Get buy recommendation 
         public async Task<Recommendation> GetBuyStockRecommendationAsync()
         {
             Recommendation recommendation = new Recommendation();
@@ -81,7 +83,7 @@ namespace RobinhoodBot
 
             return recommendation;
         }
-
+        //Get sell recommendation 
         public async Task<Recommendation> GetSellStockRecommendationAsync()
         {
             Recommendation recommendation = new Recommendation();
