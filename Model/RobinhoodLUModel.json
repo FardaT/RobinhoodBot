@@ -29,6 +29,10 @@
       ]
     },
     {
+      "name": "Decline",
+      "features": []
+    },
+    {
       "name": "None",
       "features": []
     },
@@ -279,6 +283,11 @@
       ]
     },
     {
+      "text": "buy shares",
+      "intent": "BuyAssets",
+      "entities": []
+    },
+    {
       "text": "could you recommend me stocks to buy?",
       "intent": "AskForBuyRecommendation",
       "entities": []
@@ -294,28 +303,53 @@
       "entities": []
     },
     {
-      "text": "help me by reccommending what shares to sell",
+      "text": "help me by recommending what shares to sell",
       "intent": "AskForSellRecommendation",
       "entities": []
     },
     {
+      "text": "i do not need",
+      "intent": "Decline",
+      "entities": []
+    },
+    {
+      "text": "i do not want to buy",
+      "intent": "Decline",
+      "entities": []
+    },
+    {
       "text": "i do not want to buy stocks",
-      "intent": "None",
+      "intent": "Decline",
       "entities": []
     },
     {
       "text": "i do not want to trade",
-      "intent": "None",
+      "intent": "Decline",
       "entities": []
     },
     {
       "text": "i do not wish to buy stocks",
-      "intent": "None",
+      "intent": "Decline",
+      "entities": []
+    },
+    {
+      "text": "i don't need recommendation",
+      "intent": "Decline",
       "entities": []
     },
     {
       "text": "i don't want to buy anything",
-      "intent": "None",
+      "intent": "Decline",
+      "entities": []
+    },
+    {
+      "text": "i need ideas for trading",
+      "intent": "AskForBuyRecommendation",
+      "entities": []
+    },
+    {
+      "text": "i want to buy",
+      "intent": "BuyAssets",
       "entities": []
     },
     {
@@ -394,6 +428,11 @@
       ]
     },
     {
+      "text": "i want to sell",
+      "intent": "SellAssets",
+      "entities": []
+    },
+    {
       "text": "i would like to purchase options for walt disney",
       "intent": "BuyAssets",
       "entities": [
@@ -457,6 +496,31 @@
           ]
         }
       ]
+    },
+    {
+      "text": "i would like to sell shares",
+      "intent": "SellAssets",
+      "entities": []
+    },
+    {
+      "text": "i would like to trade",
+      "intent": "BuyAssets",
+      "entities": []
+    },
+    {
+      "text": "ideas for options to sell",
+      "intent": "AskForSellRecommendation",
+      "entities": []
+    },
+    {
+      "text": "no",
+      "intent": "Decline",
+      "entities": []
+    },
+    {
+      "text": "no more",
+      "intent": "Decline",
+      "entities": []
     },
     {
       "text": "purchase 100 stocks of facebook on market price",

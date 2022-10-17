@@ -16,29 +16,30 @@ namespace RobinhoodBot.Dialogs
     public class MainDialog : ComponentDialog
     {
         private readonly StockTradingRecognizer _luisRecognizer;
+        private readonly InvestmentQuestionAnswering _investmentQuestionAnswering;
         protected readonly ILogger Logger;
 
 
         // Dependency injection uses this constructor to instantiate MainDialog
-        public MainDialog(StockTradingRecognizer luisRecognizer, ILogger<MainDialog> logger)
+        public MainDialog(StockTradingRecognizer luisRecognizer, InvestmentQuestionAnswering investmentQuestionAnswering, ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
 
             Logger = logger;
             _luisRecognizer = luisRecognizer;
+            _investmentQuestionAnswering = investmentQuestionAnswering; 
 
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
-            AddDialog(new RecommendationDialog());
+            AddDialog(new RecommendationDialog()); 
             AddDialog(new TradeDialog());
-            //AddDialog(new QuestionAnsweringDialog());
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
                 ActStepAsync,
-                FinalStepAsync,
-                EndingStepAsync,
+                ConfirmationStepAsync,
+                RestartStepAsync,
             }));
 
             // The initial child Dialog to run.
@@ -52,12 +53,11 @@ namespace RobinhoodBot.Dialogs
             if (!_luisRecognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
-                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file."), cancellationToken);
 
-                return await stepContext.NextAsync(null, cancellationToken);
+                return await stepContext.EndDialogAsync(null, cancellationToken);
             }
 
-            // Use the text provided in FinalStepAsync or the default if it is the first time.
             return await stepContext.NextAsync(null, cancellationToken);
         }
 
@@ -66,68 +66,57 @@ namespace RobinhoodBot.Dialogs
         {
 
             // Call CLU to gather info and identify intent 
-            var luisResult = await _luisRecognizer.RecognizeAsync<StockMarketTopMovers>(stepContext.Context, cancellationToken);
+            var luisResult = await _luisRecognizer.RecognizeAsync<StockMarketCognitiveModel>(stepContext.Context, cancellationToken);
+
             switch (luisResult.TopIntent().intent)
             {
-                case StockMarketTopMovers.Intent.AskForBuyRecommendation:
-                case StockMarketTopMovers.Intent.AskForSellRecommendation:
-                    
-                    var recommendationDetails = new RecommendationDetails();
+                //Initiate RecommendationDialog, logic whether it is a buy or sell implemented within the dialog
+                case StockMarketCognitiveModel.Intent.AskForBuyRecommendation:
+                case StockMarketCognitiveModel.Intent.AskForSellRecommendation:
+
+                    var recommendationLuisResult = new RecommendationDialogDetails
                     {
-                        recommendationDetails.AssetType = luisResult.Entities?.asset_type?.FirstOrDefault()?.FirstOrDefault();
-                    }
+                        //hand over luis result
+                        RecommendationLuisResult = luisResult
+                    };
 
-                    return await stepContext.BeginDialogAsync(nameof(RecommendationDialog), recommendationDetails, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(RecommendationDialog), recommendationLuisResult, cancellationToken);
 
-                case StockMarketTopMovers.Intent.BuyAssets:
-                case StockMarketTopMovers.Intent.SellAssets:
+                //Initiate TradeDialog, logic whether it is a buy or sell implemented within the dialog
+                case StockMarketCognitiveModel.Intent.BuyAssets:
+                case StockMarketCognitiveModel.Intent.SellAssets:
                     var tradeDetails = new TradeDetails()
                     {
-                        AssetName = luisResult.Entities?.purchase_details?.FirstOrDefault().asset.FirstOrDefault()?.asset_name?.FirstOrDefault(),
-                        NumberOfAssets = luisResult.Entities?.purchase_details?.FirstOrDefault().number_of_stocks?.FirstOrDefault(),
-                        Price = luisResult.Entities?.purchase_details?.FirstOrDefault().price?.FirstOrDefault(),
-                        AssetType = luisResult?.Entities?.asset_type?.FirstOrDefault()?.FirstOrDefault(),
+                        //hand over luis result
+                        TradeLuisResult = luisResult
                     };
 
                     return await stepContext.BeginDialogAsync(nameof(TradeDialog), tradeDetails, cancellationToken);
 
+                //In case the intent is dismissive, proceed to next step
+                //(rather used at reinstantiated main dialog instead of first run)
+
+                case StockMarketCognitiveModel.Intent.Decline:
+                    return await stepContext.NextAsync(luisResult.TopIntent().intent, cancellationToken);
                 default:
                     // call QA if no match for LUIS
-                    var questionAnswering = new QuestionAnswering();
-                    var response = await questionAnswering.QuestionAnswerAsync(stepContext.Context.Activity.Text);
+                    var response = await _investmentQuestionAnswering.QuestionAnswerAsync(stepContext.Context.Activity.Text);
 
                     // QA answers if possible and prompts for another question
-                    if (response.Value?.Answers?.Count > 0)
+                    if (response != null)
                     {
                         var answer = response.Value?.Answers.FirstOrDefault().Answer;
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(answer), cancellationToken);
                         break;
-                        //return await stepContext.NextAsync(null, cancellationToken);
-                        //return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                        //new PromptOptions
-                        //{
-                        //    Prompt = MessageFactory.Text("Would you like to know anything else?"),
-                        //    Choices = ChoiceFactory.ToChoices(new List<string> { "Yes", "No"}),
-                        //}, cancellationToken);
-
-                        //public static async Task<DialogTurnResult> RestartStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-                        //{
-
-                        //}
-
-
-
-
 
                     }
                     else
-                    // If no match for either QA or LUIS
                     {
-                        var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way";
-                        var didntUnderstandMessage = MessageFactory.Text(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-                        await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
-                        break;
+                        // If no match for either QA or LUIS go next step and prompt to rephrase
+
+                        return await stepContext.NextAsync(null, cancellationToken);
                     }
+
 
             }
 
@@ -135,45 +124,29 @@ namespace RobinhoodBot.Dialogs
         }
 
 
-        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> ConfirmationStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // In case of cancellation
-            // the Result here will be null.
-            if (stepContext.Result is TradeDetails result)
+            if (stepContext == Decline) // in this case if context is null, it had to come from decline intent so proceed to end dialog
             {
-                // Now we have all the booking details call the booking service.
-
-                // If the call to the booking service was successful tell the user.
-
-                var messageText = "Thank you for choosing our service";
-                var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
+                var message = MessageFactory.Text("Thank you for choosing our service!", "Thank you for choosing our service!", InputHints.IgnoringInput);
                 await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                return await stepContext.EndDialogAsync(null, cancellationToken); //null for now but may change if want to store for future conversations
             }
 
-            // Restart the main dialog with a different message the second time around
-            //var promptMessage = "What else can We do for you?";
+            if ( )
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, we could not catch that. Please repeat or rephrase your question.")}, cancellationToken);
 
-            return await stepContext.PromptAsync(nameof(ChoicePrompt),
-            new PromptOptions
-            {
-                Prompt = MessageFactory.Text("Would you like to know anything else?"),
-                Choices = ChoiceFactory.ToChoices(new List<string> { "Yes", "No" }),
-            }, cancellationToken);
-            //return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+
+            //Ask user if he/she wishes to proceed asking with a prompt - restart main dialog until dismissive intent is not recognized
+            var promptMessage = MessageFactory.Text("What else can we help you with?", InputHints.ExpectingInput);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+
         }
-        private async Task<DialogTurnResult> EndingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            if (stepContext.Context.Activity.Text == "No")
-            {
-                var messageText = "Thank you for choosing our service";
-                var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = message }, cancellationToken);
 
-            }
-            else
-            {
-                return await stepContext.ReplaceDialogAsync(InitialDialogId, cancellationToken);
-            }
+        //Restart main dialog with the question asked
+        private async Task<DialogTurnResult> RestartStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.ReplaceDialogAsync(InitialDialogId, stepContext, cancellationToken);
         }
     }
 }

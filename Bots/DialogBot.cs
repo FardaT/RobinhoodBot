@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AdaptiveCards;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace RobinhoodBot.Bots
 {
@@ -42,24 +45,28 @@ namespace RobinhoodBot.Bots
             await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
 
+        private static Attachment CreateAdaptiveCardAttachment(string filePath)
+        {
+            var adaptiveCardJson = File.ReadAllText(filePath);
+            var adaptiveCardAttachment = new Attachment()
+            {
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Content = JsonConvert.DeserializeObject(adaptiveCardJson),
+            };
+            return adaptiveCardAttachment;
+        }
+
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    var welcomecard = new ThumbnailCard
-                    {
-                        Title = "Welcome to the Robinhood trading platform!",
-                        Text = "How can we help you?",
-                        Images = new List<CardImage>() { new CardImage("https://cdn-images-1.medium.com/max/1200/1*d7fYAnWUS9rDntWGdABxPw.png") },
-                        //Buttons = new List<CardAction>()
-                        //{
 
-                        //}
-                    };
-                    var response = MessageFactory.Attachment(welcomecard.ToAttachment());
-                    await turnContext.SendActivityAsync(response, cancellationToken);
+                    var cardPath = Path.Combine(".", "CardResources", "WelcomeCard.json");
+                    IMessageActivity card = Activity.CreateMessageActivity();
+                    card.Attachments.Add(CreateAdaptiveCardAttachment(cardPath));
+                    await turnContext.SendActivityAsync(card, cancellationToken);
                 }
 
             }

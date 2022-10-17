@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-//
-// Generated with Bot Builder V4 SDK Template for Visual Studio EmptyBot v4.15.0
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;

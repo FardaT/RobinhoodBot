@@ -13,7 +13,7 @@ using Microsoft.Bot.Builder.AI.Luis;
 
 namespace RobinhoodBot.Model
 {
-    public partial class StockMarketTopMovers: IRecognizerConvert
+    public partial class StockMarketCognitiveModel : IRecognizerConvert
     {
         [JsonProperty("text")]
         public string Text;
@@ -25,6 +25,7 @@ namespace RobinhoodBot.Model
             AskForBuyRecommendation,
             AskForSellRecommendation,
             BuyAssets,
+            Decline,
             None,
             SellAssets
         };
@@ -78,7 +79,6 @@ namespace RobinhoodBot.Model
             }
             [JsonProperty("$instance")]
             public _Instance _instance;
-            internal object number_of_stocks;
         }
         [JsonProperty("entities")]
         public _Entities Entities;
@@ -88,7 +88,7 @@ namespace RobinhoodBot.Model
 
         public void Convert(dynamic result)
         {
-            var app = JsonConvert.DeserializeObject<StockMarketTopMovers>(
+            var app = JsonConvert.DeserializeObject<StockMarketCognitiveModel >(
                 JsonConvert.SerializeObject(
                     result,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Error = OnError }

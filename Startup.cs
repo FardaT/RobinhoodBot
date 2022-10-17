@@ -24,7 +24,7 @@ namespace RobinhoodBot
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public static IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -50,13 +50,19 @@ namespace RobinhoodBot
             // Register LUIS recognizer
             services.AddSingleton<StockTradingRecognizer>();
 
+            //services.AddSingleton<StockDataRequest>();
+
+
+            services.AddSingleton<InvestmentQuestionAnswering>();
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
+
+            //services.AddSingleton<RecommendationDialog>();
 
             // Create the bot as a transient. for both QnA & LUIS
             services.AddTransient<IBot, DialogBot<MainDialog>>();
 
-            
+
 
 
 
